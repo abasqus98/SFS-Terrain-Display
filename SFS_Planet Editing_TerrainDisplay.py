@@ -9,11 +9,10 @@ import json
 #############################################
 
 #EDIT HERE TO ADJUST PATH
-path_pack=r'D:\zzz\SFS\Addon 2.03- the SFS Mod Pack\Truly Terrained Solar System (FRM)\\'
-#path_pack=r'D:\zzz\SFS\IRIS x TTSS [Python]\\'
+path_pack=r''
 
 #EDIT HERE TO PICK PLANET
-planet='Haumea'
+planet=''
 
 #EDIT HERE TO ADJUST STEP
 div=100000 #100000 is both smooth and fast 
@@ -125,13 +124,6 @@ for key in ter:
                         terrain[key]['h_'+str(i+1)]['mult1values'][2*j]=float(sum(imgdat[:,j,3])/imgdim[0])
                         terrain[key]['h_'+str(i+1)]['mult1values'][2*j+1]=float(sum(imgdat[:,j,3])/imgdim[0])
 
-        
-'''   
-print(json.dumps(terrain,indent=4))
-np.set_printoptions(threshold=6)
-print(terrain)
-print(circ)
-'''
 
 #Print the content. json.dump can't simplify list
 for key0 in terrain:
@@ -149,7 +141,6 @@ for key0 in terrain:
 
 th=list(np.arange(0,2*pi*(1+1/div),2*pi/div)) #0 to 2pi
 th[len(th)-1]=2*pi
-#pos=[i*Radius for i in th] #0 to circ
 sealvl=[0 for _ in range(len(th))]
 height=sealvl
 
@@ -228,11 +219,6 @@ for diff in terrain:
                     list(map(lambda x: x*float(terrain[diff]['h_'+str(i+1)]['height']),\
                     terrain[diff]['h_'+str(i+1)]['result']))
         print(f'| done ',end="")
-                    
-          
-
-        #element2element multiplication must use numpy. convert back using .tolist()
-
         print('')
 
     terrain[diff]['heightresult']=sealvl
@@ -243,38 +229,6 @@ for diff in terrain:
                     list(map(lambda x,y:x+y, \
                     terrain[diff]['heightresult'], \
                     terrain[diff]['h_'+str(i+1)]['result']))
-
-'''''
-tryy='normal'
-
-height=terrain[tryy]['heightresult']
-
-thdeg=list(map(lambda x: x/pi*180,th))
-
-
-Rp=list(map(lambda x: x+Rdata[tryy],height))
-
-samp=4
-samp=samp/2
-thdegseam=thdeg[(len(thdeg)-ceil(samp/360*div)):]
-thdegseam=list(map(lambda x: x-360,thdegseam))
-thdegseam=thdegseam+thdeg[:(floor(samp/360*div))]
-heightseam=height[(len(height)-ceil(samp/360*div)):]+height[:(floor(samp/360*div))]
-#fig,(axp,axc)=plt.subplots(1,2)#subplot_kw={'projection':'polar'})
-
-fig=plt.figure()
-axp=fig.add_subplot(3,1,1, projection='polar')
-axp.plot(th,Rp)
-
-axc=fig.add_subplot(3,1,2)
-axc.plot(thdeg,height)
-
-axs=fig.add_subplot(3,1,3)
-axs.plot(thdegseam,heightseam)
-#plt.plot(thdeg,height)
-fig.suptitle(f'{planet[:-4]} - normal')
-plt.show()
-'''''
 
 if len(terrain) != 0:
 
@@ -314,13 +268,3 @@ if len(terrain) != 0:
     plt.show()
 
 
-
-'''''
-05 01 2026
-seam overlap
-Planet Selection
-Plotting positioning and lengend
-Application
-
-
-'''''
