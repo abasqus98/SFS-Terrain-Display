@@ -9,18 +9,15 @@ import json
 #############################################
 
 #EDIT HERE TO ADJUST PATH
-#path_pack=r'D:\zzz\SFS\Addon 2.03- the SFS Mod Pack\Truly Terrained Solar System (FRM)\\'
-#path_pack=r'D:\zzz\SFS\IRIS x TTSS [Python]\\'
-#path_pack=r'D:\zzz\SFS\IRIS x TTSS\\'
-#path_pack=r'D:\zzz\SFS\Heightmap Test - pngjpgcol\\'
-
-path_pack=r'C:\Users\Hendry\Documents\zzz\zzz SFS\IRIS x TTSS [Python]\\'
+#format: r'C:\Users\User\......\PlanetPackName\\'
+path_pack=r'\\'
 
 #EDIT HERE TO PICK PLANET
-planet='Phoebe'
+planet=''
 
 #EDIT HERE TO ADJUST STEP
-div=100000 #100000 is both smooth and fast 
+#100000 is both smooth and fast 
+div=100000 
 
 #EDIT HERE TO SKIP DIFFICULTY
 skip_normal=0
@@ -97,7 +94,6 @@ for key in ter:
         if len(ter[key][i])==6:
             terrain[key]['h_'+str(i+1)]['mult2']={}
             terrain[key]['h_'+str(i+1)]['mult2']=ter[key][i][5]
-        #print(f'h_{i} {ter[key][i][0]}')
         
         #Taking main values
         terrain[key]['h_'+str(i+1)]['values']={}
@@ -105,24 +101,16 @@ for key in ter:
             with open (path_hmap+'\\'+ter[key][i][1],'r+') as f:
                 d=json.load(f)
                 terrain[key]['h_'+str(i+1)]['values']=d['points']
-                #print(len(d['points']))
+                
         elif ter[key][i][1].endswith('.png'):
             imgdat=img.imread(path_hmap+'\\'+ter[key][i][1])
             imgdim=imgdat.shape
-            #print(imgdim)
+            
             terrain[key]['h_'+str(i+1)]['values']=[0 for _ in range(2*imgdim[1])]
             for j in range(imgdim[1]):
 
-                #forward version
-                #terrain[key]['h_'+str(i+1)]['values'][2*j]=float(sum(imgdat[:,j,3])/imgdim[0])
-                #terrain[key]['h_'+str(i+1)]['values'][2*j+1]=float(sum(imgdat[:,j,3])/imgdim[0])
-                
-                # reversed version: correct one
                 terrain[key]['h_'+str(i+1)]['values'][2*j]=float(sum(imgdat[:,imgdim[1]-1-j,3])/imgdim[0])
                 terrain[key]['h_'+str(i+1)]['values'][2*j+1]=float(sum(imgdat[:,imgdim[1]-1-j,3])/imgdim[0])
-                
-                
-                
 
         #Taking mult1 values
         if len(ter[key][i])==5 or len(ter[key][i])==6:
@@ -132,26 +120,17 @@ for key in ter:
                     with open (path_hmap+'\\'+ter[key][i][4],'r+') as f:
                         d=json.load(f)
                         terrain[key]['h_'+str(i+1)]['mult1values']=d['points']
-                        #print(len(d['points']))
+                        
                 elif ter[key][i][4].endswith('.png'):
                     imgdat=img.imread(path_hmap+'\\'+ter[key][i][4])
                     imgdim=imgdat.shape
                     #print(imgdim)
                     terrain[key]['h_'+str(i+1)]['mult1values']=[0 for _ in range(2*imgdim[1])]
                     for j in range(imgdim[1]):
-                        # NEED TO CHECK, PROBABLY REVERSED
+                        
                         terrain[key]['h_'+str(i+1)]['mult1values'][2*j]=float(sum(imgdat[:,j,3])/imgdim[0])
                         terrain[key]['h_'+str(i+1)]['mult1values'][2*j+1]=float(sum(imgdat[:,j,3])/imgdim[0])
 
-        
-'''   
-print(json.dumps(terrain,indent=4))
-np.set_printoptions(threshold=6)
-print(terrain)
-print(circ)
-'''
-
-#Print the content. json.dump can't simplify list
 for key0 in terrain:
     print(f'{key0}')
     for key1 in terrain[key0]:
@@ -167,7 +146,6 @@ for key0 in terrain:
 
 th=list(np.arange(0,2*pi*(1+1/div),2*pi/div)) #0 to 2pi
 th[len(th)-1]=2*pi
-#pos=[i*Radius for i in th] #0 to circ
 sealvl=[0 for _ in range(len(th))]
 height=sealvl
 
@@ -177,7 +155,6 @@ for diff in terrain:
     print(diff)
     for i in range(len(terrain[diff])):
         print(f'   {i+1} th hgtmp ',end="")
-        #terrain[diff]['h_'+str(i+1)]['result']={}
         terrain[diff]['h_'+str(i+1)]['result']=sealvl
 
         for j in range(len(th)):
@@ -185,11 +162,11 @@ for diff in terrain:
                   float(terrain[diff]['h_'+str(i+1)]['width'])
             ptid=ptid*(len(terrain[diff]['h_'+str(i+1)]['values'])-1)
 
-            idl=floor(ptid)%len(terrain[diff]['h_'+str(i+1)]['values']) #+1
-            idu=ceil(ptid)%len(terrain[diff]['h_'+str(i+1)]['values']) #+1
+            idl=floor(ptid)%len(terrain[diff]['h_'+str(i+1)]['values']) 
+            idu=ceil(ptid)%len(terrain[diff]['h_'+str(i+1)]['values']) 
             init=terrain[diff]['h_'+str(i+1)]['values'][idl]
             final=terrain[diff]['h_'+str(i+1)]['values'][idu]
-            #ptid=ptid+1
+            
             
             if idu==idl: terrain[diff]['h_'+str(i+1)]['result'][j]=final
             else: terrain[diff]['h_'+str(i+1)]['result'][j]=\
@@ -201,7 +178,6 @@ for diff in terrain:
             if 'mult1' in terrain[diff]['h_'+str(i+1)] and \
                not(terrain[diff]['h_'+str(i+1)]['mult1']=='null'):
                 print(f'| mult1 ',end="")
-                #result=4thparam(result, mult1values)
                 for k in range(len(terrain[diff]['h_'+str(i+1)]['result'])):
                     idxm=terrain[diff]['h_'+str(i+1)]['result'][k]*(len(\
                         terrain[diff]['h_'+str(i+1)]['mult1values'])-1)
@@ -246,11 +222,6 @@ for diff in terrain:
                     list(map(lambda x: x*float(terrain[diff]['h_'+str(i+1)]['height']),\
                     terrain[diff]['h_'+str(i+1)]['result']))
         print(f'| done ',end="")
-                    
-          
-
-        #element2element multiplication must use numpy. convert back using .tolist()
-
         print('')
 
     terrain[diff]['heightresult']=sealvl
@@ -262,37 +233,6 @@ for diff in terrain:
                     terrain[diff]['heightresult'], \
                     terrain[diff]['h_'+str(i+1)]['result']))
 
-'''''
-tryy='normal'
-
-height=terrain[tryy]['heightresult']
-
-thdeg=list(map(lambda x: x/pi*180,th))
-
-
-Rp=list(map(lambda x: x+Rdata[tryy],height))
-
-samp=4
-samp=samp/2
-thdegseam=thdeg[(len(thdeg)-ceil(samp/360*div)):]
-thdegseam=list(map(lambda x: x-360,thdegseam))
-thdegseam=thdegseam+thdeg[:(floor(samp/360*div))]
-heightseam=height[(len(height)-ceil(samp/360*div)):]+height[:(floor(samp/360*div))]
-#fig,(axp,axc)=plt.subplots(1,2)#subplot_kw={'projection':'polar'})
-
-fig=plt.figure()
-axp=fig.add_subplot(3,1,1, projection='polar')
-axp.plot(th,Rp)
-
-axc=fig.add_subplot(3,1,2)
-axc.plot(thdeg,height)
-
-axs=fig.add_subplot(3,1,3)
-axs.plot(thdegseam,heightseam)
-#plt.plot(thdeg,height)
-fig.suptitle(f'{planet[:-4]} - normal')
-plt.show()
-'''''
 
 if len(terrain) != 0:
 
@@ -331,68 +271,3 @@ if len(terrain) != 0:
     plt.suptitle(f'{planet[:-4]}: '+title)
     plt.show()
 
-
-##HAUMEA ONLY
-'''''
-ll=len(terrain['normal']['heightresult'])
-
-plt.subplot(7,1,1)
-plt.plot(thdeg,terrain['normal']['h_1']['result'])
-plt.subplot(7,1,2)
-plt.plot(thdeg,terrain['normal']['h_2']['result'])
-plt.subplot(7,1,3)
-plt.plot(thdeg,terrain['normal']['h_3']['result'])
-plt.subplot(7,1,4)
-plt.plot(thdeg,terrain['normal']['h_4']['result'])
-plt.subplot(7,1,5)
-plt.plot(thdeg,terrain['normal']['h_5']['result'])
-plt.subplot(7,1,6)
-plt.plot(thdeg,terrain['normal']['h_6']['result'])
-plt.subplot(7,1,7)
-plt.plot(thdegseam[136:141],heightseam[136:141])
-plt.show()
-
-
-
-a1=terrain['normal']['h_1']['result'][:2]
-a2=terrain['normal']['h_2']['result'][:2]
-a3=terrain['normal']['h_3']['result'][:2]
-a4=terrain['normal']['h_4']['result'][:2]
-a5=terrain['normal']['h_5']['result'][:2]
-a6=terrain['normal']['h_6']['result'][:2]
-
-
-a1=a1+terrain['normal']['h_1']['result'][-3:]
-a2=a2+terrain['normal']['h_2']['result'][-3:]
-a3=a3+terrain['normal']['h_3']['result'][-3:]
-a4=a4+terrain['normal']['h_4']['result'][-3:]
-a5=a5+terrain['normal']['h_5']['result'][-3:]
-a6=a6+terrain['normal']['h_6']['result'][-3:]
-
-plt.subplot(7,1,1)
-plt.plot(thdegseam[136:141],a1)
-plt.subplot(7,1,2)
-plt.plot(thdegseam[136:141],a2)
-plt.subplot(7,1,3)
-plt.plot(thdegseam[136:141],a3)
-plt.subplot(7,1,4)
-plt.plot(thdegseam[136:141],a4)
-plt.subplot(7,1,5)
-plt.plot(thdegseam[136:141],a5)
-plt.subplot(7,1,6)
-plt.plot(thdegseam[136:141],a6)
-plt.subplot(7,1,7)
-plt.plot(thdegseam[136:141],heightseam[136:141])
-plt.show()
-
-###HAUMEA ONLY
-'''''
-'''''
-05 01 2026
-seam overlap
-Planet Selection
-Plotting positioning and lengend
-Application
-
-
-'''''
